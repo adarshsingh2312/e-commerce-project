@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order,Long> {
     @Query("""
-    Select o From Order o where o.user.id=:userId And (o.status ="PLACED" or o.status="CONFIRMED" or o.status="SHIPPED" or o.status="DELIVERED")
+    Select o From Order o where o.user.id=:userId And (o.status ="PLACED" or o.status="CONFIRMED" or o.status="SHIPPED" or o.status="DELIVERED" or o.status="PENDING")
 """)
     public List<Order> getAllOrders(@Param("userId") Long userId);
 }

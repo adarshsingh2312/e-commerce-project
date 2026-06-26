@@ -16,6 +16,8 @@ public class CartServiceImpl implements CartService{
     private final CartRepository cartRepository;
     private final CartItemService cartItemService;
     private final ProductService productService;
+    private final UserService userService;
+
     @Override
     public Cart createCart(User user) {
         Cart cart = new Cart();
@@ -26,6 +28,11 @@ public class CartServiceImpl implements CartService{
     @Override
     public String addCartItem(Long userId, AddItemRequest request) throws ProductException {
         Cart cart = cartRepository.findByUserId(userId);
+        if (cart == null) {
+            // Auto-create cart if missing
+            User user = userService.findUserById(userId);
+            cart = createCart(user);
+        }
         Product product = productService.findProductById(request.getProductId());
         CartItem isPresent =  cartItemService.cartItemExist(cart,product,request.getSize(),userId);
         if(isPresent==null){
