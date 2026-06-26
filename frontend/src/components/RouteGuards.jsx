@@ -6,7 +6,7 @@ export const Loader = () => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] py-12">
     <div className="w-12 h-12 border-4 border-brand-accent border-t-transparent rounded-full animate-spin"></div>
     <p className="mt-4 text-sm font-medium text-gray-500 tracking-wider uppercase animate-pulse">
-      Loading eMart...
+      Loading eMART...
     </p>
   </div>
 );

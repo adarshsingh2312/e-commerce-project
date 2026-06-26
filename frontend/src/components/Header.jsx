@@ -30,7 +30,7 @@ export const Header = () => {
         <div className="flex gap-6 items-center">
           <Link to="/contact" className="hover:text-white transition-colors duration-200">Contact</Link>
           <span className="text-gray-600">|</span>
-          <Link to="/about" className="hover:text-white transition-colors duration-200">Our Story</Link>
+          {/* <Link to="/about" className="hover:text-white transition-colors duration-200">Our Story</Link> */}
         </div>
       </div>
 
@@ -105,10 +105,6 @@ export const Header = () => {
               </Link>
             </div>
           </div>
-
-          <Link to="/news" className="text-sm font-semibold tracking-wider text-brand-primary hover:text-brand-accent uppercase transition-colors duration-200">
-            News
-          </Link>
         </nav>
 
         {/* Right Side Icons */}

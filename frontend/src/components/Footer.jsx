@@ -35,7 +35,7 @@ export const Footer = () => {
           <div className="space-y-2 pt-2 text-xs">
             <div className="flex items-center gap-2.5">
               <Phone className="w-3.5 h-3.5 text-brand-accent" />
-              <span>+1 (800) 555-EMART</span>
+              <span>+91 9798979897</span>
             </div>
             <div className="flex items-center gap-2.5">
               <Mail className="w-3.5 h-3.5 text-brand-accent" />
@@ -43,7 +43,7 @@ export const Footer = () => {
             </div>
             <div className="flex items-center gap-2.5">
               <MapPin className="w-3.5 h-3.5 text-brand-accent" />
-              <span>100 Fashion Blvd, Suite 400, NY</span>
+              <span>100 Connaught Place New Delhi, 110001</span>
             </div>
           </div>
         </div>
@@ -101,7 +101,7 @@ export const Footer = () => {
       <div className="bg-brand-light py-6 border-t border-gray-900">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500 gap-4">
           <div>
-            &copy; 2026 eMart Inc. All rights reserved.
+            &copy; 2026 eMART Inc. All rights reserved.
           </div>
           <div className="flex gap-6">
             <Link to="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
