@@ -17,6 +17,7 @@ public class OrderServiceImpl implements OrderService{
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final CartService cartService;
+    private final Productrepository productRepository;
 
     @Override
     public Order createOrder(User user, Address address) {
@@ -27,8 +28,37 @@ public class OrderServiceImpl implements OrderService{
         Cart cart = cartService.findUserCart(user.getId());
         List<OrderItems> orderItems = new ArrayList<>();
         for(CartItem cartItem : cart.getCartItems()){
+            Product product = cartItem.getProduct();
+            Size orderSize = cartItem.getSize();
+            int orderedQty = cartItem.getQuantity();
+            if(orderSize!=null){
+                String sizeName = orderSize.getName();
+                if (sizeName != null && !sizeName.isBlank()) {
+                    boolean sizeFound = false;
+                    for (Size size : product.getSizes()) {
+                        if (size.getName().equalsIgnoreCase(sizeName)) {
+                            sizeFound = true;
+                            if (size.getQty() < orderedQty) {
+                                throw new OrderException("Insufficient stock for product " + product.getTitle() + " in size " + sizeName + " (Available: " + size.getQty() + ", Requested: " + orderedQty + ")");
+                            }
+                            size.setQty(size.getQty() - orderedQty);
+                            break;
+                        }
+                    }
+                    if (!sizeFound) {
+                        throw new OrderException("Size " + sizeName + " not found for product " + product.getTitle());
+                    }
+                }
+            }
+            // 2. Check and decrement overall product quantity
+            if (product.getQuantity() < orderedQty) {
+                throw new OrderException("Insufficient overall stock for product " + product.getTitle() + " (Available: " + product.getQuantity() + ", Requested: " + orderedQty + ")");
+            }
+            product.setQuantity(product.getQuantity() - orderedQty);
+            // Save the updated product quantities
+            productRepository.save(product);
             OrderItems orderItem1 = new OrderItems();
-            orderItem1.setProduct(cartItem.getProduct());
+            orderItem1.setProduct(product);
             orderItem1.setPrice(cartItem.getPrice());
             orderItem1.setQuantity(cartItem.getQuantity());
             orderItem1.setSize(cartItem.getSize());
@@ -55,7 +85,6 @@ public class OrderServiceImpl implements OrderService{
         }
         return savedOrder;
     }
-
     @Override
     public Order findOrderById(Long id) {
         return orderRepository.findById(id)
@@ -102,13 +131,48 @@ public class OrderServiceImpl implements OrderService{
 
     }
 
-    @Override
-    public Order cancelledOrder(Long id) {
-        Order order = orderRepository.findById(id).orElseThrow(
-                ()->new OrderException("No Orders found"));
-        order.setStatus("CANCELLED");
-        return orderRepository.save(order);
+//    @Override
+//    public Order cancelledOrder(Long id) {
+//        Order order = orderRepository.findById(id).orElseThrow(
+//                ()->new OrderException("No Orders found"));
+//        order.setStatus("CANCELLED");
+//        return orderRepository.save(order);
+//    }
+@Override
+public Order cancelledOrder(Long id) {
+    Order order = orderRepository.findById(id).orElseThrow(
+            ()->new OrderException("No Orders found"));
+    // Prevent duplicate restoration if already cancelled
+    if ("CANCELLED".equals(order.getStatus())) {
+        return order;
     }
+    // Restore product quantities
+    for (OrderItems item : order.getOrderItems()) {
+        Product product = item.getProduct();
+        Size orderSize = item.getSize();
+        int qty = item.getQuantity();
+
+        if (orderSize != null) {
+            String sizeName = orderSize.getName();
+            if (sizeName != null && !sizeName.isBlank()) {
+                for (Size size : product.getSizes()) {
+                    if (size.getName().equalsIgnoreCase(sizeName)) {
+                        size.setQty(size.getQty() + qty);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Restore overall product quantity
+        product.setQuantity(product.getQuantity() + qty);
+        productRepository.save(product);
+    }
+
+    order.setStatus("CANCELLED");
+    return orderRepository.save(order);
+}
+
 
     @Override
     public List<Order> getAllOrders() {

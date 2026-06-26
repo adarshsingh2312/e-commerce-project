@@ -8,7 +8,7 @@ export const Header = () => {
   const { user, logout } = useAuth();
   const { cart } = useCart();
   const navigate = useNavigate();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -26,7 +26,7 @@ export const Header = () => {
     <header className="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
       {/* Utility Bar */}
       <div className="bg-brand-primary text-gray-300 text-xs py-2 px-4 md:px-8 flex justify-between items-center tracking-wide">
-        <div>FREE STANDARD SHIPPING ON ORDERS OVER $150</div>
+        <div>FREE STANDARD SHIPPING ON ORDERS OVER ₹499</div>
         <div className="flex gap-6 items-center">
           <Link to="/contact" className="hover:text-white transition-colors duration-200">Contact</Link>
           <span className="text-gray-600">|</span>
@@ -38,8 +38,8 @@ export const Header = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex justify-between items-center">
         {/* Logo */}
         <Link to="/" className="flex flex-col items-start select-none">
-          <span className="font-serif font-bold text-2xl tracking-widest text-brand-primary uppercase">
-            eMart
+          <span className="font-serif font-bold text-2xl tracking-widest text-brand-primary ">
+            e-MART
           </span>
           <span className="text-[9px] tracking-[0.25em] text-brand-accent uppercase -mt-1 font-semibold">
             EST. 2026

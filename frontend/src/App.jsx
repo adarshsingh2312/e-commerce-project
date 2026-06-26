@@ -5,12 +5,12 @@ import { CartProvider } from './context/CartContext';
 import { Layout } from './components/Layout';
 import { PrivateRoute, AdminRoute } from './components/RouteGuards';
 
-// Pages
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { ProductDetails } from './pages/ProductDetails';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { Contact } from './pages/Contact';
 import { Cart } from './pages/Cart';
 import { Checkout } from './pages/Checkout';
 import { OrderHistory } from './pages/OrderHistory';
@@ -47,6 +47,7 @@ function App() {
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Register />} />
+              <Route path="/contact" element={<Contact />} />
 
               {/* Customer Private Routes */}
               <Route

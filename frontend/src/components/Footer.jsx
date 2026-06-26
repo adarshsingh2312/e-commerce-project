@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export const Footer = () => {
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (!newsletterEmail) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    toast.success('Thank you for subscribing to our newsletter!');
+    setNewsletterEmail('');
+  };
   return (
     <footer className="bg-brand-primary text-gray-400 text-sm mt-auto border-t border-gray-900">
       {/* Upper Footer Grid */}
@@ -66,10 +78,13 @@ export const Footer = () => {
           <p className="text-xs leading-relaxed">
             Subscribe to receive updates, access to exclusive deals, and more.
           </p>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-2">
+          <form onSubmit={handleNewsletterSubmit} className="space-y-2">
             <input
               type="email"
               placeholder="Enter your email"
+              required
+              value={newsletterEmail}
+              onChange={(e) => setNewsletterEmail(e.target.value)}
               className="w-full px-4 py-2.5 text-xs bg-brand-light border border-gray-800 text-white rounded-sm placeholder-gray-500 focus:outline-none focus:border-brand-accent transition-colors"
             />
             <button
