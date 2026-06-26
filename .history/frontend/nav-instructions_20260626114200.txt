@@ -1,0 +1,32 @@
+# ROLE & TASK
+You are an expert React/Frontend Developer specializing in Tailwind CSS.
+Your task is to build a responsive, two-tier Navigation Bar for my e-commerce application.
+
+# CRITICAL SYSTEM RULES
+Do NOT write, modify, or suggest changes to any backend code (Spring Boot, Java, MySQL). 
+Restrict all your code generation strictly to the frontend React/UI files.
+
+# TIER 1: TOP NAVBAR (Branding, Search, & Auth)
+Use a flexbox layout to divide this navbar into three distinct sections:
+1. LEFT (Brand): Display the text logo "eMart". Make it a clickable link routing to `/`.
+2. CENTER (Search): A wide search input bar with a search icon/button inside or next to it.
+3. RIGHT (Actions): 
+   - A "Cart" icon/button.
+   - Auth State: Implement mock state (`const [isLoggedIn, setIsLoggedIn] = useState(false)`). 
+   - If `isLoggedIn` is false, show "Login / Register" text links. 
+   - If `isLoggedIn` is true, show a "Profile" icon and a "Logout" button.
+
+# TIER 2: SECOND NAVBAR (Categories Menu)
+Place this horizontally directly below the Top Navbar.
+Display these exact category links: Men, Women, Kids, Home & Living, Beauty.
+
+# CATEGORY DATA MAPPING (CRUCIAL)
+Our backend product data uses a strict JSON hierarchy. When you build routing, mega-menus, or dropdowns for these links, you must align them with this structure:
+- `topLevelCategory`: Maps to the main links (e.g., "Men", "Women", "Kids").
+- `secondLevelCategory`: Determines the broad type under them (e.g., "Clothing", "Footwear").
+- `thirdLevelCategory`: Determines the specific item (e.g., "Shirt", "Saree", "Shoes").
+
+# OUTPUT INSTRUCTIONS
+1. Generate the functional React components for these navbars.
+2. Apply Tailwind CSS classes to ensure it is fully responsive and looks modern.
+3. Keep the code modular (e.g., extract the SearchBar or AuthButtons into their own mini-components if necessary) so I can easily drop in my JWT authentication later.
