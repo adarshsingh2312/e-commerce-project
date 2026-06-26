@@ -31,7 +31,6 @@ export const Register = () => {
     e.preventDefault();
     setValidationError('');
 
-    // Quick validation
     const { firstName, lastName, email, mobileNumber, password } = formData;
     if (!firstName || !lastName || !email || !mobileNumber || !password) {
       setValidationError('All fields are required.');
@@ -67,7 +66,6 @@ export const Register = () => {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Name Section - Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
@@ -110,7 +108,6 @@ export const Register = () => {
             </div>
           </div>
 
-          {/* Email and Mobile - Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
@@ -153,7 +150,6 @@ export const Register = () => {
             </div>
           </div>
 
-          {/* Password and Role - Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
@@ -208,7 +204,6 @@ export const Register = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}

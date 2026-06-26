@@ -22,6 +22,7 @@ public class Rating {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore // nahi to nested problem ho jayega
     private User user;
 
     @JsonIgnore
