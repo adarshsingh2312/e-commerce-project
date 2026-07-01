@@ -30,7 +30,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Address> addresses = new ArrayList<>();
-
     @Embedded// iska alag se entity nahi banega...(no individual table)
     @ElementCollection
     @CollectionTable(name = "payments_information", joinColumns = @JoinColumn(name = "user_id"))

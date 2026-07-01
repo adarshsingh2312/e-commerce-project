@@ -19,10 +19,13 @@ public class OrderController {
     private final UserService userService;
     private final OrderService orderService;
     @PostMapping
-    public ResponseEntity<Order> createOrder(@RequestHeader("Authorization") String jwt, @RequestBody Address address){
+    public ResponseEntity<Order> createOrder(
+            @RequestHeader("Authorization") String jwt, 
+            @RequestBody Address address,
+            @RequestHeader(value = "X-Payment-Method", required = false, defaultValue = "COD") String paymentMethod) {
         User user = userService.findUserByJwt(jwt);
-        Order order = orderService.createOrder(user,address);
-        return new ResponseEntity<>(order,HttpStatus.CREATED);
+        Order order = orderService.createOrder(user, address, paymentMethod);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
     @GetMapping
     public ResponseEntity<Order> findOrderById(Long id){
@@ -40,5 +43,20 @@ public class OrderController {
         User user = userService.findUserByJwt(jwt);
         Order order = orderService.findOrderById(id);
         return new ResponseEntity<>(order,HttpStatus.ACCEPTED);
+    }
+
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<Order> cancelOrder(@PathVariable Long id,
+                                             @RequestHeader("Authorization") String jwt) throws Exception {
+        User user = userService.findUserByJwt(jwt);
+        Order order = orderService.findOrderById(id);
+        if (!order.getUser().getId().equals(user.getId())) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        if ("DELIVERED".equalsIgnoreCase(order.getStatus())) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Order cancelled = orderService.cancelledOrder(id);
+        return new ResponseEntity<>(cancelled, HttpStatus.OK);
     }
 }

@@ -20,7 +20,7 @@ public class OrderServiceImpl implements OrderService{
     private final Productrepository productRepository;
 
     @Override
-    public Order createOrder(User user, Address address) {
+    public Order createOrder(User user, Address address, String paymentMethod) {
         address.setUser(user);
         Address address1 = addressRepository.save(address);
         user.getAddresses().add(address1); // user address added for future reusability...
@@ -77,6 +77,7 @@ public class OrderServiceImpl implements OrderService{
         createdOrder.setAddress(address1);
         createdOrder.setStatus("PENDING");
         createdOrder.getPaymentdetails().setPaymentStatus("PENDING");
+        createdOrder.getPaymentdetails().setPaymentMethod(paymentMethod != null ? paymentMethod : "COD");
         createdOrder.setOrderDate(LocalDateTime.now());
         Order savedOrder = orderRepository.save(createdOrder);
         for(OrderItems item : orderItems){

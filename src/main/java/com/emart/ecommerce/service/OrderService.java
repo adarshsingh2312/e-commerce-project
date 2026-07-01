@@ -7,7 +7,7 @@ import com.emart.ecommerce.model.User;
 import java.util.List;
 
 public interface OrderService {
-    public Order createOrder(User user, Address address);
+    public Order createOrder(User user, Address address, String paymentMethod);
     public Order findOrderById(Long id);
     public List<Order> userOrderHistory(Long userId);
     public Order placedOrder(Long id);

@@ -12,4 +12,7 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
     Select o From Order o where o.user.id=:userId And (o.status ="PLACED" or o.status="CONFIRMED" or o.status="SHIPPED" or o.status="DELIVERED" or o.status="PENDING")
 """)
     public List<Order> getAllOrders(@Param("userId") Long userId);
+    @Query("SELECT o FROM Order o WHERE o.paymentdetails.razorpayPaymentLinkId = :razorpayOrderId")
+    public Order findByRazorpayOrderId(@Param("razorpayOrderId") String razorpayOrderId);
+
 }

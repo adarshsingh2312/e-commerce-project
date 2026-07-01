@@ -25,9 +25,9 @@ public class Review {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
-
 }

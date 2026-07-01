@@ -89,13 +89,12 @@ export const Register = () => {
                   required
                   value={formData.firstName}
                   onChange={handleChange}
-                  placeholder="John"
+                  placeholder="Vaibhav"
                   className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-sm placeholder-gray-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
                 />
               </div>
             </div>
 
-            {/* Last Name */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
                 Last Name
@@ -110,14 +109,13 @@ export const Register = () => {
                   required
                   value={formData.lastName}
                   onChange={handleChange}
-                  placeholder="Doe"
+                  placeholder="Sharma"
                   className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-sm placeholder-gray-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
                 />
               </div>
             </div>
           </div>
 
-          {/* Email Address */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
               Email Address
@@ -132,7 +130,7 @@ export const Register = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="john.doe@example.com"
+                placeholder="vaibhav.sharma@gmail.com"
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-gray-200 rounded-sm placeholder-gray-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
               />
             </div>

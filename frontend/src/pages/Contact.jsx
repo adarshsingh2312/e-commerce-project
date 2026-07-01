@@ -125,7 +125,6 @@ export const Contact = () => {
             <h3 className="font-serif text-2xl font-bold text-brand-primary mb-6">Send Us a Message</h3>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Name */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
                   Your Name
@@ -136,12 +135,11 @@ export const Contact = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="John Doe"
+                  placeholder="Vaibhav Sharma"
                   className="w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-sm placeholder-gray-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
                 />
               </div>
 
-              {/* Email */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-gray-700 block">
                   Email Address
@@ -152,7 +150,7 @@ export const Contact = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="john.doe@example.com"
+                  placeholder="vaibhav.sharma@gmail.com"
                   className="w-full px-4 py-3 text-sm bg-white border border-gray-200 rounded-sm placeholder-gray-400 focus:outline-none focus:border-brand-accent focus:ring-1 focus:ring-brand-accent transition-all"
                 />
               </div>

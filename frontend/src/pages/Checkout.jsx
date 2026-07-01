@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import { formatPrice } from '../utils/formatPrice';
 import { Loader } from '../components/RouteGuards';
-import { ShieldCheck, ChevronRight, CreditCard, Home } from 'lucide-react';
+import { ShieldCheck, ChevronRight, CreditCard, Home, Smartphone, MapPin } from 'lucide-react';
 import API from '../services/api';
 import toast from 'react-hot-toast';
 
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
+
 export const Checkout = () => {
   const { cart, fetchCart } = useCart();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -21,8 +37,37 @@ export const Checkout = () => {
     mobileNumber: '',
   });
 
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+
+  const handleSelectAddress = (addr) => {
+    if (addr) {
+      setSelectedAddressId(addr.id);
+      setFormData({
+        firstName: addr.firstName || '',
+        lastName: addr.lastName || '',
+        streetAddress: addr.streetAddress || '',
+        cityName: addr.cityName || '',
+        state: addr.state || '',
+        zipCode: addr.zipCode || '',
+        mobileNumber: addr.mobileNumber || '',
+      });
+    } else {
+      setSelectedAddressId(null);
+      setFormData({
+        firstName: '',
+        lastName: '',
+        streetAddress: '',
+        cityName: '',
+        state: '',
+        zipCode: '',
+        mobileNumber: '',
+      });
+    }
+  };
+
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
 
   const cartItems = cart?.cartItems ? Array.from(cart.cartItems) : [];
 
@@ -59,17 +104,63 @@ export const Checkout = () => {
 
     setSubmitting(true);
     try {
-      // Post order to backend
-      const response = await API.post('/api/orders', formData);
+      const response = await API.post('/api/orders', formData, {
+        headers: {
+          'X-Payment-Method': paymentMethod
+        }
+      });
       const createdOrder = response.data;
-      
-      toast.success('Order placed successfully!');
-      
-      // Sync the cart state (which is now empty on the backend)
-      await fetchCart();
-      
-      // Redirect to the newly created order's details page
-      navigate(`/orders/${createdOrder.id}`);
+
+      if (paymentMethod === 'COD') {
+        toast.success('Order placed successfully (Cash on Delivery)!');
+        await fetchCart();
+        navigate(`/orders/${createdOrder.id}`);
+        return;
+      }
+
+      const scriptLoaded = await loadRazorpayScript();
+      if (!scriptLoaded) {
+        toast.error('Failed to load Razorpay SDK. Please check your internet connection.');
+        setSubmitting(false);
+        return;
+      }
+
+      const orderRes = await API.post(`/api/payments/create-order/${createdOrder.id}`);
+      const paymentDetails = orderRes.data;
+
+      const options = {
+        key: 'rzp_test_T75cz57uStNvTk',
+        amount: createdOrder.totalDiscountedPrice * 100,
+        currency: 'INR',
+        name: 'eMART',
+        description: `Checkout Payment for Order #${createdOrder.id}`,
+        order_id: paymentDetails.razorpayPaymentLinkId,
+        handler: async function (paymentRes) {
+          try {
+            await API.post('/api/payments/verify', {
+              razorpay_payment_id: paymentRes.razorpay_payment_id,
+              razorpay_order_id: paymentRes.razorpay_order_id,
+              razorpay_signature: paymentRes.razorpay_signature,
+            });
+            toast.success('Payment verified & order placed successfully!');
+            await fetchCart();
+            navigate(`/orders/${createdOrder.id}`);
+          } catch (verifyErr) {
+            console.error('Payment verification failed:', verifyErr);
+            toast.error('Payment verification failed. Please contact customer support.');
+          }
+        },
+        prefill: {
+          name: `${firstName} ${lastName}`,
+          contact: mobileNumber,
+        },
+        theme: {
+          color: '#D97706',
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (err) {
       console.error('Failed to place order:', err);
       const errorMsg = err.response?.data?.message || 'Failed to submit order. Please try again.';
@@ -79,6 +170,7 @@ export const Checkout = () => {
       setSubmitting(false);
     }
   };
+
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 min-h-screen">
@@ -107,6 +199,59 @@ export const Checkout = () => {
             </div>
           )}
 
+          {/* Saved Addresses list */}
+          {user && user.addresses && user.addresses.length > 0 && (
+            <div className="mb-8 border border-gray-150 p-5 rounded-sm bg-gray-50/50">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-brand-primary block mb-3.5 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-brand-accent" /> Select Saved Shipping Address
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {user.addresses.map((addr) => (
+                  <div
+                    key={addr.id}
+                    onClick={() => handleSelectAddress(addr)}
+                    className={`border p-4 rounded-sm cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                      selectedAddressId === addr.id
+                        ? 'border-brand-accent bg-amber-50/5'
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}
+                  >
+                    <div>
+                      <div className="flex justify-between items-center mb-1">
+                        <p className="text-xs font-bold uppercase tracking-wider text-brand-primary truncate">
+                          {addr.firstName} {addr.lastName}
+                        </p>
+                        {selectedAddressId === addr.id && (
+                          <span className="w-2 h-2 rounded-full bg-brand-accent inline-block"></span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-gray-500 leading-normal font-light">
+                        {addr.streetAddress}, {addr.cityName}, {addr.state} - {addr.zipCode}
+                      </p>
+                    </div>
+                    {addr.mobileNumber && (
+                      <p className="text-[9px] text-gray-400 font-bold tracking-wider mt-3 uppercase">Ph: {addr.mobileNumber}</p>
+                    )}
+                  </div>
+                ))}
+                
+                {/* Clear / Add new option */}
+                <div
+                  onClick={() => handleSelectAddress(null)}
+                  className={`border border-dashed p-4 rounded-sm cursor-pointer transition-all duration-250 flex items-center justify-center text-center ${
+                    selectedAddressId === null
+                      ? 'border-brand-accent bg-amber-50/5'
+                      : 'border-gray-300 bg-white hover:border-gray-400 hover:bg-gray-50/20'
+                  }`}
+                >
+                  <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                    + Use A Different Address
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -120,11 +265,11 @@ export const Checkout = () => {
                   required
                   value={formData.firstName}
                   onChange={handleChange}
-                  placeholder="John"
+                  placeholder="Rahul"
                   className="w-full px-4 py-3 text-xs border border-gray-200 rounded-sm focus:outline-none focus:border-brand-accent"
                 />
               </div>
-              
+
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700 block">
                   Last Name
@@ -135,7 +280,7 @@ export const Checkout = () => {
                   required
                   value={formData.lastName}
                   onChange={handleChange}
-                  placeholder="Doe"
+                  placeholder="Verma"
                   className="w-full px-4 py-3 text-xs border border-gray-200 rounded-sm focus:outline-none focus:border-brand-accent"
                 />
               </div>
@@ -223,18 +368,57 @@ export const Checkout = () => {
 
             <div className="border-t border-gray-150 pt-6 space-y-4">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-700">
-                <CreditCard className="w-5 h-5 text-brand-accent" />
-                <span>Payment Method</span>
+                <CreditCard className="w-4 h-4 text-brand-accent" />
+                <span>Select Payment Method</span>
               </div>
-              <div className="bg-gray-50 border border-gray-200 p-4 rounded-sm flex items-center gap-3">
-                <input
-                  type="radio"
-                  defaultChecked
-                  className="w-4 h-4 text-brand-accent accent-brand-accent"
-                />
-                <div>
-                  <p className="text-xs font-bold uppercase text-brand-primary">Cash on Delivery (COD)</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">Pay in cash when your shipment arrives.</p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Cash on Delivery */}
+                <div
+                  onClick={() => setPaymentMethod('COD')}
+                  className={`border p-5 rounded-sm cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                    paymentMethod === 'COD'
+                      ? 'border-brand-accent bg-amber-50/5'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-primary">Cash On Delivery</span>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={paymentMethod === 'COD'}
+                      onChange={() => setPaymentMethod('COD')}
+                      className="w-4 h-4 text-brand-accent accent-brand-accent cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 leading-normal">
+                    Pay in cash when your shipment arrives at your doorstep.
+                  </p>
+                </div>
+
+                {/* Online Payment via Razorpay */}
+                <div
+                  onClick={() => setPaymentMethod('ONLINE')}
+                  className={`border p-5 rounded-sm cursor-pointer transition-all duration-200 flex flex-col justify-between ${
+                    paymentMethod === 'ONLINE'
+                      ? 'border-brand-accent bg-amber-50/5'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand-primary">Pay Online</span>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={paymentMethod === 'ONLINE'}
+                      onChange={() => setPaymentMethod('ONLINE')}
+                      className="w-4 h-4 text-brand-accent accent-brand-accent cursor-pointer"
+                    />
+                  </div>
+                  <p className="text-[10px] text-gray-400 leading-normal">
+                    Secure checkout using Cards, UPI, NetBanking, or Wallets via Razorpay.
+                  </p>
                 </div>
               </div>
             </div>
@@ -244,11 +428,10 @@ export const Checkout = () => {
               disabled={submitting}
               className="w-full bg-brand-primary hover:bg-brand-light text-white text-xs uppercase tracking-widest font-bold py-4 rounded-sm transition-all duration-200 shadow-md hover:-translate-y-0.5 disabled:opacity-50"
             >
-              Place Order
+              Proceed to Pay
             </button>
           </form>
         </div>
-
         {/* Order Summary Sidebar */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-gray-50 border border-gray-150 p-6 rounded-sm space-y-6">
@@ -300,7 +483,7 @@ export const Checkout = () => {
               </div>
               <div className="border-t border-gray-250 pt-3 flex justify-between text-brand-primary text-sm font-black uppercase tracking-wider">
                 <span>Total Amount</span>
-                <span className="text-lg font-serif">{formatPrice(cart.totalDiscountedPrice || 0)}</span>
+                <span className="text-lg font-serif" id="amountToPay">{formatPrice(cart.totalDiscountedPrice || 0)}</span>
               </div>
             </div>
           </div>

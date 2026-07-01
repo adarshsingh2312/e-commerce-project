@@ -4,12 +4,14 @@ import { Calendar, MapPin, Phone, User, Package, Check, ChevronLeft } from 'luci
 import API from '../services/api';
 import { formatPrice } from '../utils/formatPrice';
 import { Loader } from '../components/RouteGuards';
+import toast from 'react-hot-toast';
 
 export const OrderDetails = () => {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [cancelling, setCancelling] = useState(false);
 
   const fetchOrderDetails = async () => {
     setLoading(true);
@@ -22,6 +24,23 @@ export const OrderDetails = () => {
       setError('Could not retrieve order details. Please verify your connection.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+      return;
+    }
+    setCancelling(true);
+    try {
+      await API.put(`/api/orders/${id}/cancel`);
+      toast.success('Order has been cancelled successfully.');
+      await fetchOrderDetails();
+    } catch (err) {
+      console.error('Failed to cancel order:', err);
+      toast.error('Could not cancel order. Please try again.');
+    } finally {
+      setCancelling(false);
     }
   };
 
@@ -251,6 +270,16 @@ export const OrderDetails = () => {
               <p className="font-bold uppercase text-brand-accent mt-0.5">{order.status || 'PENDING'}</p>
             </div>
           </div>
+
+          {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && (
+            <button
+              onClick={handleCancelOrder}
+              disabled={cancelling}
+              className="w-full mt-4 bg-red-600 hover:bg-red-700 disabled:bg-gray-300 text-white text-xs uppercase tracking-widest font-bold py-3.5 rounded-sm transition-colors cursor-pointer hover:shadow-md text-center"
+            >
+              {cancelling ? 'Cancelling...' : 'Cancel Order'}
+            </button>
+          )}
         </aside>
       </div>
     </div>

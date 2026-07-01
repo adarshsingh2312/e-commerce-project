@@ -32,7 +32,6 @@ public class Address {
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User user;
-
     private String mobileNumber;
 
 }
