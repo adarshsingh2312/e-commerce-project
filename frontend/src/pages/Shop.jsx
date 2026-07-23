@@ -11,12 +11,12 @@ const AVAILABLE_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
 export const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   // All products fetched from the database
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Sidebar open for mobile
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -168,7 +168,7 @@ export const Shop = () => {
   const updateParam = (key, value) => {
     const params = new URLSearchParams(searchParams);
     params.set('page', '0'); // Reset page when query changes
-    
+
     if (value) {
       params.set(key, value);
     } else {
@@ -197,13 +197,13 @@ export const Shop = () => {
     e.preventDefault();
     const params = new URLSearchParams(searchParams);
     params.set('page', '0');
-    
+
     if (minPriceInput) params.set('minPrice', minPriceInput);
     else params.delete('minPrice');
-    
+
     if (maxPriceInput) params.set('maxPrice', maxPriceInput);
     else params.delete('maxPrice');
-    
+
     setSearchParams(params);
   };
 
@@ -378,11 +378,10 @@ export const Shop = () => {
                   <button
                     key={sz}
                     onClick={() => toggleArrayParam('sizes', sz)}
-                    className={`w-9 h-9 border text-xs font-bold uppercase transition-all duration-200 rounded-sm flex items-center justify-center ${
-                      isActive
+                    className={`w-9 h-9 border text-xs font-bold uppercase transition-all duration-200 rounded-sm flex items-center justify-center ${isActive
                         ? 'border-brand-primary bg-brand-primary text-white shadow-sm'
                         : 'border-gray-200 text-gray-700 hover:border-brand-primary'
-                    }`}
+                      }`}
                   >
                     {sz}
                   </button>
@@ -556,11 +555,10 @@ export const Shop = () => {
                       <button
                         key={sz}
                         onClick={() => toggleArrayParam('sizes', sz)}
-                        className={`w-9 h-9 border text-xs font-bold uppercase rounded-sm flex items-center justify-center ${
-                          isActive
+                        className={`w-9 h-9 border text-xs font-bold uppercase rounded-sm flex items-center justify-center ${isActive
                             ? 'border-brand-primary bg-brand-primary text-white shadow-sm'
                             : 'border-gray-200 text-gray-700'
-                        }`}
+                          }`}
                       >
                         {sz}
                       </button>

@@ -2,6 +2,7 @@ package com.emart.ecommerce.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 //import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -21,6 +22,8 @@ import java.util.List;
 
 @Configuration
 public class AppConfig {
+    @Value("${frontend.url}")
+    private String frontendUrl;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         //  You are telling Spring Security: “Do NOT create or use HTTP sessions for authentication.”
@@ -35,9 +38,11 @@ public class AppConfig {
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
                     cfg.setAllowedOrigins(Arrays.asList(
+                            frontendUrl,
                             "http://localhost:3000",
                             "http://localhost:4200",
                             "http://localhost:8080",
+                            "https://emartcom.vercel.app",
                             "http://localhost:5173"));
                     cfg.setAllowedMethods(Collections.singletonList("*"));
                     cfg.setAllowCredentials(true);
