@@ -32,6 +32,7 @@ public class AppConfig {
                 .authorizeHttpRequests(auth->
                         auth.requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/api/products", "/api/products/**").permitAll()
+                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/**").authenticated()
                                 .anyRequest().permitAll())
                 .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class).csrf(AbstractHttpConfigurer::disable)
