@@ -1,5 +1,6 @@
 # eMART — Premium Fashion E-Commerce Platform
 Website Link-: https://emartcom.vercel.app
+
 eMART is a full-stack, production-grade e-commerce web application designed with a modern, high-contrast, clean sans-serif aesthetic inspired by industry leaders like Myntra and Amazon.
 
 It is built using a decoupled architecture, pairing a responsive, state-managed React frontend with a secure Spring Boot (Java) REST API backend.
