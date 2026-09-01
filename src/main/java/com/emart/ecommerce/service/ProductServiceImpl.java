@@ -97,7 +97,8 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<Product> findProductsByCategory(String category) throws ProductException {
-        return List.of();
+        List<Product> products = productrepository.filterProducts(category, null, null, null, "price_low");
+        return products;
     }
 
     @Override // most important method..
