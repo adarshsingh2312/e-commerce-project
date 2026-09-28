@@ -1,6 +1,7 @@
 package com.emart.ecommerce.service;
 
 import com.emart.ecommerce.config.JwtProvider;
+import com.emart.ecommerce.model.AuthProvider;
 import com.emart.ecommerce.request.UserRequest;
 import com.emart.ecommerce.exception.UserException;
 import com.emart.ecommerce.model.User;
@@ -69,6 +70,7 @@ public class UserService {
         user.setPassword(userRequest.getPassword());
         user.setMobileNumber(userRequest.getMobileNumber());
         user.setRole(userRequest.getRole());
+        user.setProvider(AuthProvider.LOCAL);
         return user;
     }
 

@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -30,7 +31,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Address> addresses = new ArrayList<>();
-    @Embedded// iska alag se entity nahi banega...(no individual table)
+    @Embedded // iska alag se entity nahi banega...(no individual table)
     @ElementCollection
     @CollectionTable(name = "payments_information", joinColumns = @JoinColumn(name = "user_id"))
     private List<PaymentInfo> paymentInfos = new ArrayList<>();
@@ -46,4 +47,6 @@ public class User {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    private AuthProvider provider = AuthProvider.LOCAL;
 }
