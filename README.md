@@ -10,7 +10,7 @@ It is built using a decoupled architecture, pairing a responsive, state-managed 
 ## 🚀 Key Features
 
 ### 🛒 Customer Experience
-* **Secure Authentication (JWT)**: JSON Web Token-based user sessions supporting credentials validation, local token caching, and automatic logouts on session expiration.
+* **Dual Authentication System (JWT & Google OAuth2)**: Supports both traditional email/password credentials and one-click "Continue with Google" OAuth2 single sign-on (SSO), backed by custom JWT token issuance, automated profile generation, initial cart setup, and unified session management.
 * **Dynamic Catalog & Smart Filtering**: Client-side categorization, case-insensitive gender filtering (Men/Women/Accessories), and catalog sorting synced dynamically.
 * **Size-Specific Inventory Management**: Interactive size and quantity selectors that validate real-time stock levels prior to checkout.
 * **Real-time Shopping Bag**: State-managed shopping cart context with real-time price summation, Indian numbering currency formatting (₹), and quantity thresholds.
@@ -32,6 +32,7 @@ It is built using a decoupled architecture, pairing a responsive, state-managed 
 
 ### **Frontend**
 * **Framework**: React (Vite)
+* **Authentication Flow**: Google OAuth2 Redirect & Callback Handler, JWT Storage in Context
 * **Styling**: Tailwind CSS v4 (Vanilla CSS variables)
 * **Charts**: Recharts
 * **Icons**: Lucide React
@@ -41,7 +42,7 @@ It is built using a decoupled architecture, pairing a responsive, state-managed 
 
 ### **Backend**
 * **Framework**: Spring Boot (Java 17+)
-* **Security**: Spring Security & JWT tokens
+* **Security & Auth**: Spring Security 6, OAuth2 Client (`spring-boot-starter-oauth2-client`), Google Identity, JJWT (HMAC SHA)
 * **SDK Integration**: Razorpay Java SDK
 * **Database Access**: Spring Data JPA (Hibernate)
 * **Database**: MySQL / H2
