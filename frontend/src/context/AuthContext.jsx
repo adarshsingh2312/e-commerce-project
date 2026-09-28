@@ -101,6 +101,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Login with raw token (OAuth2 callback flow)
+  const loginWithToken = async (authToken) => {
+    setLoading(true);
+    try {
+      localStorage.setItem('token', authToken);
+      setToken(authToken);
+      
+      const profile = await fetchUserProfile(authToken);
+      if (profile) {
+        toast.success(`Welcome back, ${profile.firstName || 'User'}!`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Failed to log in with OAuth token:', error);
+      toast.error('Authentication failed. Please try again.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Logout function
   const logout = () => {
     localStorage.removeItem('token');
@@ -116,6 +138,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     signup,
+    loginWithToken,
     logout,
     refreshUser: () => fetchUserProfile(token)
   };

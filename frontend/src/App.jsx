@@ -10,6 +10,7 @@ import { Shop } from './pages/Shop';
 import { ProductDetails } from './pages/ProductDetails';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { OAuthCallback } from './pages/OAuthCallback';
 import { Contact } from './pages/Contact';
 import { Cart } from './pages/Cart';
 import { Checkout } from './pages/Checkout';
@@ -47,6 +48,7 @@ function App() {
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Register />} />
+              <Route path="/oauth-callback" element={<OAuthCallback />} />
               <Route path="/contact" element={<Contact />} />
 
               {/* Customer Private Routes */}
