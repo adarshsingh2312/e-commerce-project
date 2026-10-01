@@ -128,8 +128,15 @@ export const Checkout = () => {
       const orderRes = await API.post(`/api/payments/create-order/${createdOrder.id}`);
       const paymentDetails = orderRes.data;
 
+      const razorpayKey = import.meta.env.VITE_RAZORPAY_KEY_ID || import.meta.env.VITE_RAZORPAY_KEY;
+      if (!razorpayKey) {
+        toast.error('Razorpay Key ID is not configured. Please check your environment variables.');
+        setSubmitting(false);
+        return;
+      }
+
       const options = {
-        key: 'rzp_test_T75cz57uStNvTk',
+        key: razorpayKey,
         amount: createdOrder.totalDiscountedPrice * 100,
         currency: 'INR',
         name: 'eMART',

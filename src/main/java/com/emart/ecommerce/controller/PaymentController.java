@@ -12,6 +12,7 @@ import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,10 @@ public class PaymentController {
     private final UserService userService;
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-
+    @Value("${RAZORPAY_KEY}")
+    private String razorpayKey;
+    @Value("${RAZORPAY_SECRET}")
+    private String razorpaySecret;
     @PostMapping("/create-order/{order_id}")
     public ResponseEntity<PaymentDetails> createOrder(@RequestHeader("Authorization") String jwt,
                                                       @PathVariable Long order_id) throws RazorpayException {
@@ -34,7 +38,7 @@ public class PaymentController {
         }
         long totalAmount = order.getTotalDiscountedPrice() * 100L; // paise
         try{
-            RazorpayClient razorpayClient = new RazorpayClient("rzp_test_T75cz57uStNvTk","XAT1q8JLGDjv3CZxU7ngqhg0");
+            RazorpayClient razorpayClient = new RazorpayClient(razorpayKey,razorpaySecret);
             JSONObject orderRequest = new JSONObject();
             orderRequest.put("amount",totalAmount);
             orderRequest.put("currency","INR");
@@ -58,7 +62,7 @@ public class PaymentController {
             attributes.put("razorpay_payment_id", request.getRazorpay_payment_id());
             attributes.put("razorpay_signature", request.getRazorpay_signature());
 
-            boolean isValid = com.razorpay.Utils.verifyPaymentSignature(attributes, "XAT1q8JLGDjv3CZxU7ngqhg0");
+            boolean isValid = com.razorpay.Utils.verifyPaymentSignature(attributes, razorpaySecret);
             if (isValid) {
                 Order order = orderRepository.findByRazorpayOrderId(request.getRazorpay_order_id());
                 if (order == null) {

@@ -1,6 +1,9 @@
 package com.emart.ecommerce.config;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class JwtConstant {
-    public static final String SECRET_KEY = "my_super_secret_key_that_is_at_least_32_characters_long";
+    @Value("${jwt.secret}")
+    private String jwtSecret;
     public static final String JWT_HEADER = "Authorization";
 }

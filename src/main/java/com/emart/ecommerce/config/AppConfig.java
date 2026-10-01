@@ -25,6 +25,8 @@ public class AppConfig {
     private String frontendUrl;
     @Autowired
     private OAuth2SuccessHandler oAuth2SuccessHandler;
+    @Autowired
+    private JwtValidator jwtValidator;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // You are telling Spring Security: “Do NOT create or use HTTP sessions for
@@ -37,7 +39,7 @@ public class AppConfig {
                         .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler))
-                .addFilterBefore(new JwtValidator(), BasicAuthenticationFilter.class)
+                .addFilterBefore(jwtValidator, BasicAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration cfg = new CorsConfiguration();
