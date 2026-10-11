@@ -38,7 +38,9 @@ public class PaymentController {
         }
         long totalAmount = order.getTotalDiscountedPrice() * 100L; // paise
         try{
-            RazorpayClient razorpayClient = new RazorpayClient(razorpayKey,razorpaySecret);
+            String cleanKey = razorpayKey != null ? razorpayKey.replace("\"", "").replace("'", "").trim() : "";
+            String cleanSecret = razorpaySecret != null ? razorpaySecret.replace("\"", "").replace("'", "").trim() : "";
+            RazorpayClient razorpayClient = new RazorpayClient(cleanKey, cleanSecret);
             JSONObject orderRequest = new JSONObject();
             orderRequest.put("amount",totalAmount);
             orderRequest.put("currency","INR");
@@ -48,6 +50,7 @@ public class PaymentController {
             order.getPaymentdetails().setPaymentStatus("PENDING");
             order.getPaymentdetails().setPaymentMethod("Razorpay");
             order.getPaymentdetails().setRazorpayPaymentLinkId(razorpayOrderId);
+            order.getPaymentdetails().setRazorpayKeyId(cleanKey);
             orderRepository.save(order);
             return new ResponseEntity<>(order.getPaymentdetails(), HttpStatus.OK);
         } catch (RazorpayException e) {
@@ -57,12 +60,13 @@ public class PaymentController {
     @PostMapping("/verify")
     public ResponseEntity<PaymentDetails> verifyPayment(@RequestBody PaymentRequest request) throws RazorpayException {
         try {
+            String cleanSecret = razorpaySecret != null ? razorpaySecret.replace("\"", "").replace("'", "").trim() : "";
             JSONObject attributes = new JSONObject();
             attributes.put("razorpay_order_id", request.getRazorpay_order_id());
             attributes.put("razorpay_payment_id", request.getRazorpay_payment_id());
             attributes.put("razorpay_signature", request.getRazorpay_signature());
 
-            boolean isValid = com.razorpay.Utils.verifyPaymentSignature(attributes, razorpaySecret);
+            boolean isValid = com.razorpay.Utils.verifyPaymentSignature(attributes, cleanSecret);
             if (isValid) {
                 Order order = orderRepository.findByRazorpayOrderId(request.getRazorpay_order_id());
                 if (order == null) {
