@@ -1,10 +1,9 @@
 # Build Stage
 FROM maven:3.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline -B || true
+COPY pom.xml settings.xml ./
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn -s settings.xml clean package -DskipTests
 
 # Runtime Stage
 FROM eclipse-temurin:17-jre-alpine
@@ -16,5 +15,3 @@ EXPOSE 8080
 
 # Tuned JVM parameters for free-tier 512MB RAM constraints (prevents OOM crashes)
 ENTRYPOINT ["sh", "-c", "java -XX:+UseSerialGC -Xmx350m -Xss512k -Dserver.port=${PORT:-8080} -jar app.jar"]
-
-
