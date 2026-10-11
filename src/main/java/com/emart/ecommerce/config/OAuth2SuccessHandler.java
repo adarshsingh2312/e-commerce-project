@@ -83,7 +83,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             user = savedUser;
         }
 
-        String role = user.getRole() != null ? user.getRole().toUpperCase() : "CUSTOMER";
+        String role = user.getRole() != null ? user.getRole().trim().toUpperCase() : "CUSTOMER";
+        if (role.startsWith("ROLE_")) {
+            role = role.substring(5);
+        }
         List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                 new SimpleGrantedAuthority("ROLE_" + role)
         );
